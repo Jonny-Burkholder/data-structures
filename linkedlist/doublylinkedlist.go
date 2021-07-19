@@ -48,24 +48,6 @@ func (l *doublyLinkedList) Put(data interface{}) {
 	l.Length++
 }
 
-//Push places an item at the beginning of the list
-func (l *doublyLinkedList) Push(data interface{}) {
-	item := newDoubleItem(data)
-	if l.Length == 0 {
-		l.Head = item
-		l.Tail = item
-	} else if l.Length == 1 {
-		l.Head = item
-		l.Head.next = l.Tail
-		l.Tail.previous = item
-	} else {
-		l.Head.previous = item
-		item.next = l.Head
-		l.Head = item
-	}
-	l.Length++
-}
-
 //Pop removes an item from the end of the list, or returns a non-nil error if there are no items in
 //the list
 func (l *doublyLinkedList) Pop() (*doubleItem, error) {
@@ -84,6 +66,24 @@ func (l *doublyLinkedList) Pop() (*doubleItem, error) {
 	}
 	l.Length--
 	return item, nil
+}
+
+//Unshift places an item at the beginning of the list
+func (l *doublyLinkedList) Unshift(data interface{}) {
+	item := newDoubleItem(data)
+	if l.Length == 0 {
+		l.Head = item
+		l.Tail = item
+	} else if l.Length == 1 {
+		l.Head = item
+		l.Head.next = l.Tail
+		l.Tail.previous = item
+	} else {
+		l.Head.previous = item
+		item.next = l.Head
+		l.Head = item
+	}
+	l.Length++
 }
 
 //Shift removes an item from the beginning of the list, or returns a non-nil error if list is empty
