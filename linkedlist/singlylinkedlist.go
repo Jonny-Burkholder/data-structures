@@ -57,15 +57,21 @@ func (l *linkedList) Push(data interface{}) {
 	item := l.newItem(data)
 	if l.Length == 0 {
 		l.Head = item
+		l.Tail = item
 		l.Length++
-		return
+	} else if l.Length == 1 {
+		l.Head.next = item
+		l.Tail = item
+		l.Length++
+	} else {
+		current := l.Head
+		for i := 0; i < l.Length-1; i++ { //should get us to the last item. I can't brain, I'll have to test it
+			current = current.next
+		}
+		current.next = item
+		l.Tail = item
+		l.Length++
 	}
-	current := l.Head
-	for i := 0; i < l.Length-1; i++ {
-		current = current.next
-	}
-	current.next = item
-	l.Length++
 }
 
 //Pop removes and returns the last item in the list
@@ -76,6 +82,7 @@ func (l *linkedList) Pop() *item {
 	}
 	res := current.next
 	current.next = &item{}
+	l.Tail = current
 	l.Length--
 	return res
 }
@@ -85,18 +92,12 @@ func (l *linkedList) Unshift(data interface{}) {
 	item := l.newItem(data)
 	if l.Length == 0 {
 		l.Head = item
-		l.Length++
-	} else if l.Length == 1 {
-		l.Head.next = item
-		l.Length++
+		l.Tail = item
 	} else {
-		current := l.Head
-		for i := 0; i < l.Length-1; i++ { //should get us to the last item. I can't brain, I'll have to test it
-			current = current.next
-		}
-		current.next = item
-		l.Length++
+		item.next = l.Head
+		l.Head = item
 	}
+	l.Length++
 }
 
 //Shift removes an item from the beginning of the list
@@ -108,9 +109,11 @@ func (l *linkedList) Shift() (*item, error) {
 	it := l.Head
 	l.Length--
 
-	if l.Length == 1 {
+	if l.Length == 0 {
 		l.Head = &item{}
 		l.Tail = &item{}
+	} else if l.Length == 1 {
+		l.Head = l.Tail
 	} else {
 		l.Head = l.Head.next
 	}
