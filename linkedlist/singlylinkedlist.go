@@ -4,7 +4,8 @@ import "fmt"
 
 //this is the island of misfit structures
 
-//LinkedList is a single-linked list
+//LinkedList is a single linked list. This is based more on the methods and items it contains,
+//rather than on the structure itself
 type LinkedList struct {
 	Length int
 	Head   *Item
