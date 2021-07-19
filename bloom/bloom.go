@@ -1,6 +1,6 @@
 package bloom
 
-//Filter is an array of type bool, since I don't really know how to work with bits yet
+//gotta learn how to index a byte by bits before I can really do this very effectively
 type FIlter struct {
-	Filter []bool
+	Filter []byte
 }
