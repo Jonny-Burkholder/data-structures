@@ -8,10 +8,10 @@ func TestSinglePush(t *testing.T) {
 	l.Push("two")
 	l.Push("three")
 	if l.Head.data != "one" {
-		t.Errorf("Incorrect item, wanted %s, got %s", "item one", l.Head.data)
+		t.Errorf("Incorrect item, wanted %s, got %s", "one", l.Head.data)
 	}
-	if l.Tail.data != "two" {
-		t.Errorf("Incorrect item, wanted %s, got %s", "two", l.Tail.data)
+	if l.Tail.data != "three" {
+		t.Errorf("Incorrect item, wanted %s, got %s", "three", l.Tail.data)
 	}
 	if l.Length != 3 {
 		t.Errorf("Incorrect list length, wanted %v, got %v", 3, l.Length)
@@ -41,9 +41,9 @@ func TestSinglePop(t *testing.T) {
 
 func TestSingleUnshift(t *testing.T) {
 	l := NewLinkedList()
-	l.Unshift("one")
-	l.Unshift("two")
 	l.Unshift("three")
+	l.Unshift("two")
+	l.Unshift("one")
 
 	if l.Head.data != "one" {
 		t.Errorf("Incorrect head data, wanted %s, got %s", "one", l.Head.data)
@@ -58,9 +58,9 @@ func TestSingleUnshift(t *testing.T) {
 
 func TestSingleShift(t *testing.T) {
 	l := NewLinkedList()
-	l.Unshift(1)
-	l.Unshift(2)
 	l.Unshift(3)
+	l.Unshift(2)
+	l.Unshift(1)
 
 	data, _ := l.Shift()
 
