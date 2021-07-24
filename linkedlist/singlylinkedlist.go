@@ -149,7 +149,8 @@ func (l *linkedList) Delete(it *item) error {
 //DeleteIndex takes an int as input and removes the item at that index from the list, where applicaple
 func (l *linkedList) DeleteIndex(index int) error {
 	if index < 0 {
-		return fmt.Errorf("Try a positive number, joker")
+		//Need to update this to use modulus on the index length to find the correct index from a negative
+		return fmt.Errorf("Error, currently unable to index negatively")
 	}
 	if index == 0 {
 		l.Head = l.Head.next
