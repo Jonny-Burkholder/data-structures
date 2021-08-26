@@ -56,7 +56,7 @@ func (b *BTree) AddEntry(data []byte) {
 }
 
 //Search takes a slice of bytes as an argument and searches the tree for that data, returning
-//the node containing the data, or a non-nil error if the data is not found in the tree
+//the node containing the data, or nil if the data is not found in the tree
 func (b *BTree) Search(data []byte, n *Node) *Node {
 	if n == nil {
 		return n
