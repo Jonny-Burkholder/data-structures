@@ -1,4 +1,9 @@
-//package heap
+package heap
+
+import (
+	"bytes"
+	"fmt"
+)
 
 //Heap implements the heap abstract data type
 type Heap struct {
@@ -24,66 +29,71 @@ func (h *Heap) getRightChild(i int) int {
 }
 
 //getParent takes an integer argument for an index and returns the index of the parent node
-func (h *Heap) getParent(i int) int{
-	return (i-1)/2
+func (h *Heap) getParent(i int) int {
+	return (i - 1) / 2
 }
 
 //AddEntry adds an entry to the end of the heap
-func (h *Heap) Insert(b []byte){
+func (h *Heap) Insert(b []byte) {
 	h.Heap = append(h.Heap, b)
 	h.heapifyUp()
 }
 
 //Extract removes and returns the max entry in the heap
-func (h *Heap) Extract() ([]byte, error){
-	if len(h.Heap) < 1{
-		return []byte, fmt.Errorf("Unable to extract: heap size is 0")
+func (h *Heap) Extract() ([]byte, error) {
+	if len(h.Heap) < 1 {
+		return []byte{}, fmt.Errorf("Unable to extract: heap size is 0")
 	}
 	res := h.Heap[0]
-	h.Heap = h.Heap[0] = h.Heap[len(h.Heap)-1]
 	h.Heap = h.Heap[:len(h.Heap)-1]
-	h.HeapifyDown()
+	h.heapifyDown(0)
 	return res, nil
 }
 
 //heapifyUp sorts the heap after a new entry
-func (h *Heap) heapifyUp(){
-	
-	current := h.Heap[len(h.Heap)-1]
+func (h *Heap) heapifyUp() {
 
-	for h.Heap[h.GetParent(current)] > h.Heap[current]{
-		h.Swap(current, next)
-		current = next
+	current := len(h.Heap) - 1
+
+	parent := h.getParent(current)
+
+	for bytes.Compare(h.Heap[current], h.Heap[parent]) > 0 {
+		h.Swap(current, parent)
+		current = parent
+		parent = h.getParent(current)
 	}
 }
 
 //Swap switches the value of two indices
-func (h *Heap) Swap(current, next int){
+func (h *Heap) Swap(current, next int) {
 	h.Heap[current], h.Heap[next] = h.Heap[next], h.Heap[current]
 }
 
-//CompareChildren compares the children of a given index and returns the larger. If the right child
-//does not exist, the left child is returned
-func (h *Heap) CompareChildren(i int) int{
-	
-	left := h.getLeftChild(i)
-
-	right := h.getRightChild(i)
-	
-	if left >= len(h.Heap){
-		return nil
-	}
-	if right >= len(h.Heap){
-		return left
-	}
-	if res := bytes.Compare(h.Heap[left], h.Heap[right])
-}
-
-
 //heapifyDown sorts the heap after removing an entry
-func (h *Heap) heapifyDown(i int){
+func (h *Heap) heapifyDown(i int) {
 
-	if h.getLeftChild(i) > len(h.Heap){
+	left := h.getLeftChild(i)
+	right := h.getRightChild(i)
+
+	//check that there are children. If not, return
+	if left > len(h.Heap) {
 		return
+	} else if right > len(h.Heap) { //if there is a left child, but not right, compare left to parent
+		if bytes.Compare(h.Heap[left], h.Heap[i]) > 0 {
+			h.Swap(left, i)
+		}
+	} else {
+		//compare children to see which is larger
+		child := 0
+		if bytes.Compare(h.Heap[left], h.Heap[right]) > 0 {
+			child = left
+		} else {
+			child = right
+		}
+		//compare larger child to parent
+		if bytes.Compare(h.Heap[child], h.Heap[i]) > 0 {
+			h.Swap(i, child)
+			h.heapifyDown(child)
+		}
 	}
 }
