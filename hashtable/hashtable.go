@@ -97,16 +97,12 @@ func (h *HashTable) Put(key string, data []byte) {
 		if res.Next != nil {
 			res = res.Next
 		} else {
-			entry.Previous = res.Previous.Next //Jenked up as can be, but I can just use res, so I gotta be fancy with pointers
+			entry.Previous = res
 			res.Next = entry
 		}
 	}
 	//If entry is found, update the data in the entry
-	if res.Previous == nil {
-		h.Data[hash] = entry
-	} else {
-		res.Previous.Next.Data = data //More poiner dancing
-	}
+	res.Data = data //hopefully that works
 }
 
 //Search takes a string argument for a key and returns a pointer to an entry and a bool value. If the
@@ -131,6 +127,9 @@ func (h *HashTable) Delete(key string) error {
 	h.Mu.Lock()
 	defer h.Mu.Unlock()
 	res := h.Data[hash]
+	if res == nil {
+		return fmt.Errorf("Error: Entry for %q does not exist", key)
+	}
 	for res.Key != key {
 		if res.Next != nil {
 			res = res.Next
@@ -138,6 +137,18 @@ func (h *HashTable) Delete(key string) error {
 			return fmt.Errorf("Error: Entry for %q does not exist", key)
 		}
 	}
-	h.Data[hash] = &Entry{} //kind of the nuclear option, I'll make it more specific later
+	if res.Previous != nil {
+		if res.Next != nil {
+			//if res is between two entries, close the gap
+			res.Previous.Next = res.Next
+			res.Next.Previous = res.Previous
+		} else {
+			res.Previous.Next = &Entry{}
+		}
+	} else if res.Next != nil {
+		h.Data[hash] = res.Next
+	} else {
+		h.Data[hash] = &Entry{} //kind of the nuclear option, I'll make it more specific later
+	}
 	return nil
 }
