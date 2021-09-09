@@ -15,6 +15,7 @@ type Entry struct {
 //HashTable is where the data is stored and what we implement methods on. It will take a string as a
 //key and a byte slice as data
 type HashTable struct {
+	//I'd love to have both len and cap here, but cap is basically infinite because of separate chaining
 	Len  int
 	Data []*Entry
 	Mux  sync.Mutex
@@ -34,30 +35,31 @@ func (h *HashTable) badHash(s string) int {
 func (h *HashTable) Put(key string, data []byte) {
 	hash := h.badHash(key)
 	h.Mux.Lock()
-	//check if there is an entry in the table
-	res := h.Data[hash]
-	if res.Data != nil { //if entry is not empty
-		//check if the key matches
-		for res.Key != key { //go to next entry while key doesn't match and next entry is available
-			if res.Next != nil {
-				res = res.Next
-			} else {
-				break
-			}
-		}
-		res.Next = &Entry{
-			Key:  key,
-			Data: data,
-		}
-	}
-	h.Data[hash] = &Entry{
+	defer h.Mux.Unlock()
+	entry := &Entry{
 		Key:  key,
 		Data: data,
 	}
-	h.Mux.Unlock()
+	//check if there is an entry in the table
+	res := h.Data[hash]
+
+	if res.Data == nil {
+		h.Data[hash] = entry
+		return
+	}
+
+	//check if the key matches
+	for res.Key != key { //go to next entry while key doesn't match and next entry is available
+		if res.Next != nil {
+			res = res.Next
+		} else {
+			res.Next = entry
+		}
+	}
+
 }
 
-//Search taeks a string argument for a key and returns a pointer to an entry and a bool value. If the
+//Search takes a string argument for a key and returns a pointer to an entry and a bool value. If the
 //entry is found, it is returned with the value true. Otherwise, a pointer to an empty entry is returned,
 //along with the value false
 func (h *HashTable) Search(key string) (*Entry, bool) {
@@ -77,6 +79,7 @@ func (h *HashTable) Search(key string) (*Entry, bool) {
 func (h *HashTable) Delete(key string) error {
 	hash := h.badHash(key)
 	h.Mux.Lock()
+	defer h.Mux.Unlock()
 	res := h.Data[hash]
 	for res.Key != key {
 		if res.Next != nil {
@@ -85,7 +88,6 @@ func (h *HashTable) Delete(key string) error {
 			return fmt.Errorf("Error: Entry for %q does not exist", key)
 		}
 	}
-	res = &Entry{} //this is pretty lousy, but hey what the heck
-	h.Mux.Unlock()
+	h.Data[hash] = &Entry{} //kind of the nuclear option, I'll make it more specific later
 	return nil
 }
