@@ -72,8 +72,5 @@ func (f *finder) JoinEager(parent, child int) error {
 //Connected tells us if there is a connection between two numbers
 //Again, I could make this variadic, but see above
 func (f *finder) Connected(i, j int) bool { //I realize I'm using super inconsistent naming, but I haven't learned any proper terms here
-	if f.arr[i] != f.arr[j] {
-		return false
-	}
-	return true
+	return f.arr[i] == f.arr[j]
 }
