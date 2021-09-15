@@ -44,6 +44,16 @@ func (q *quickfinder) inrange(nums ...int) bool {
 	return true
 }
 
+//root finds the root of a given index. It then returns the root and then length of that branch
+func (q *quickfinder) root(a int) (int, int) {
+	len := 1
+	for q.arr[a] != a {
+		a = q.arr[a]
+		len++
+	}
+	return a, len
+}
+
 //QuickJoin takes two integer arguments as indices, and joins them such that the second index points
 //to the first. If either index is out of range, function will return a non-nil error
 func (q *quickfinder) QuickJoin(a, b int) error {
@@ -59,13 +69,17 @@ func (q *quickfinder) QuickJoinEager(a, b int) error {
 	if !q.inrange(a, b) {
 		return fmt.Errorf("Error: index out of range %v", q.len)
 	}
-	for q.arr[a] != a {
-		a = q.arr[a]
+
+	a, lena := q.root(a)
+	b, lenb := q.root(b)
+
+	if lena > lenb { //if a is the longer branch
+		q.arr[b] = a //point b to a
+	} else {
+		q.arr[a] = b //point a to b
 	}
-	for q.arr[b] != b {
-		b = q.arr[b]
-	}
-	q.arr[b] = a //point root of b to root of a
+
+	return nil
 }
 
 //Connected takes two integer arguments and returns a bool of whether or not those indices are
@@ -74,13 +88,9 @@ func (q *quickfinder) Connected(a, b int) bool {
 	if !q.inrange(a, b) {
 		return false
 	}
-	//let's get to the root of a
-	for q.arr[a] != a { //for as long as we're not at the root
-		a = q.arr[a]
-	}
-	//rinse and repeat with b
-	for q.arr[b] != b { //for as long as we're not at the root
-		b = q.arr[b]
-	}
+
+	a, _ = q.root(a)
+	b, _ = q.root(b)
+
 	return a == b //if they have the same root, they're connected
 }
