@@ -59,11 +59,13 @@ func (q *quickfinder) QuickJoinEager(a, b int) error {
 	if !q.inrange(a, b) {
 		return fmt.Errorf("Error: index out of range %v", q.len)
 	}
-	if q.arr[b] == b {
-		q.arr[b] = a
-		return nil
+	for q.arr[a] != a {
+		a = q.arr[a]
 	}
-	return q.QuickJoinEager(a, q.arr[b])
+	for q.arr[b] != b {
+		b = q.arr[b]
+	}
+	q.arr[b] = a //point root of b to root of a
 }
 
 //Connected takes two integer arguments and returns a bool of whether or not those indices are
