@@ -68,17 +68,17 @@ func (q *quickfinder) QuickJoinEager(a, b int) error {
 
 //Connected takes two integer arguments and returns a bool of whether or not those indices are
 //connected. If one or both indices is out of range, function will return false
-//Note that this only works if a is lower on the tree than b. So basically, it's garbage
 func (q *quickfinder) Connected(a, b int) bool {
 	if !q.inrange(a, b) {
 		return false
 	}
-	if a == b { //if the indexes walk into each other, they're connected
-		return true
+	//let's get to the root of a
+	for q.arr[a] != a { //for as long as we're not at the root
+		a = q.arr[a]
 	}
-	if q.arr[b] == b { //if we reach the end of the tree without finding a connection
-		return false
+	//rinse and repeat with b
+	for q.arr[b] != b { //for as long as we're not at the root
+		b = q.arr[b]
 	}
-	//if neither is true, walk one more step down the tree
-	return q.Connected(a, q.arr[b])
+	return a == b //if they have the same root, they're connected
 }
