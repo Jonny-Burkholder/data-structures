@@ -48,6 +48,7 @@ func (q *quickfinder) inrange(nums ...int) bool {
 func (q *quickfinder) root(a int) (int, int) {
 	len := 1
 	for q.arr[a] != a {
+		q.arr[a] = q.arr[q.arr[a]] //point each node to its grandparent to flatten the tree. I think it's safe?
 		a = q.arr[a]
 		len++
 	}
