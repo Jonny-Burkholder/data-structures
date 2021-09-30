@@ -33,16 +33,25 @@ func Merge(a, b []int) []int {
 		}
 	} else {
 		res = make([]int, 0)
-		res = append(res, a...)
-		res = append(res, b...)
-		for i := range res {
-			for j := range res {
-				if res[i] < res[j] {
-					res[i], res[j] = res[j], res[i]
-				}
+		i, j := 0, 0
+		for i < len(a) && j < len(b) {
+			if a[i] == b[j] {
+				res = append(res, a[i])
+				i++
+				j++
+				continue
+			}
+			if a[i] < b[j] {
+				res = append(res, a[i])
+				i++
+				continue
+			}
+			if a[i] > b[j] {
+				res = append(res, b[j])
+				j++
+				continue
 			}
 		}
 	}
-
 	return res
 }
