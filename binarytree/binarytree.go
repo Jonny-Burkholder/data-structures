@@ -2,12 +2,7 @@ package binarytree
 
 import (
 	"bytes"
-	"errors"
 )
-
-var errorNullNodeRotate = errors.New("Error: Cannot rotate null node")
-var errorNullChildren = errors.New("Error: Node contains no children")
-var errorNullChild = errors.New("Error: Child not found")
 
 //BinaryTree has a root node pointer and implements basic BinaryTree functions
 type BinaryTree struct {
@@ -32,10 +27,14 @@ func NewBinaryTree() *BinaryTree {
 	return &BinaryTree{}
 }
 
-//AddEntry takes a byte slice as an argument, creates a node, and adds it to the tree
-func (b *BinaryTree) AddEntry(data []byte) {
+//Put takes a byte slice as an argument, creates a node, and adds it to the tree
+func (b *BinaryTree) Put(data []byte) {
 	//create node
 	node := newNode(data)
+	if b.First == nil {
+		b.First = node
+		return
+	}
 	current := b.First
 	for { //no conditions because we'll return within the loop
 		//compare node to current node
@@ -55,6 +54,7 @@ func (b *BinaryTree) AddEntry(data []byte) {
 				current = current.RightChild
 			}
 		} else {
+			//if they are equal, entry is already in tree
 			break
 		}
 	}
@@ -74,15 +74,4 @@ func (b *BinaryTree) Search(data []byte, n *Node) *Node {
 	} else {
 		return n
 	}
-}
-
-//RotateLeft switches a parent node and its right child
-func (b *BinaryTree) RotateLeft(n *Node) error {
-	if n == nil {
-		return errorNullNodeRotate
-	}
-	if n.RightChild == nil {
-		return errorNullChild
-	}
-	return nil
 }
