@@ -1,11 +1,16 @@
-package tree
+package binarytree
 
 import (
 	"bytes"
+	"errors"
 )
 
-//BTree has a root node pointer and implements basic BTree functions
-type BTree struct {
+var errorNullNodeRotate = errors.New("Error: Cannot rotate null node")
+var errorNullChildren = errors.New("Error: Node contains no children")
+var errorNullChild = errors.New("Error: Child not found")
+
+//BinaryTree has a root node pointer and implements basic BinaryTree functions
+type BinaryTree struct {
 	First *Node
 }
 
@@ -22,13 +27,13 @@ func newNode(data []byte) *Node {
 	}
 }
 
-//NewBTree creates and returns a BTree
-func NewBTree() *BTree {
-	return &BTree{}
+//NewBinaryTree creates and returns a BinaryTree
+func NewBinaryTree() *BinaryTree {
+	return &BinaryTree{}
 }
 
 //AddEntry takes a byte slice as an argument, creates a node, and adds it to the tree
-func (b *BTree) AddEntry(data []byte) {
+func (b *BinaryTree) AddEntry(data []byte) {
 	//create node
 	node := newNode(data)
 	current := b.First
@@ -57,7 +62,7 @@ func (b *BTree) AddEntry(data []byte) {
 
 //Search takes a slice of bytes as an argument and searches the tree for that data, returning
 //the node containing the data, or nil if the data is not found in the tree
-func (b *BTree) Search(data []byte, n *Node) *Node {
+func (b *BinaryTree) Search(data []byte, n *Node) *Node {
 	if n == nil {
 		return n
 	}
@@ -69,4 +74,15 @@ func (b *BTree) Search(data []byte, n *Node) *Node {
 	} else {
 		return n
 	}
+}
+
+//RotateLeft switches a parent node and its right child
+func (b *BinaryTree) RotateLeft(n *Node) error {
+	if n == nil {
+		return errorNullNodeRotate
+	}
+	if n.RightChild == nil {
+		return errorNullChild
+	}
+	return nil
 }
