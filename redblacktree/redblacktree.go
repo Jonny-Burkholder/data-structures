@@ -97,6 +97,8 @@ func (b *RedBlackTree) rotateLeft(n *Node) error {
 	n.rightChild = res.leftChild
 	//make res's parent the node's parent
 	res.parent = n.parent
+	//make res's left child n
+	res.leftChild = n
 	//if res is head of tree, mark in tree. Otherwise, make child of parent node
 	if res.parent == nil {
 		b.first = res
