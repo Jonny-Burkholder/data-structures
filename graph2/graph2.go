@@ -1,6 +1,9 @@
 package graph
 
-import "errors"
+import (
+	"bytes"
+	"errors"
+)
 
 var errMustBePositive = errors.New("Index value must be positive")
 var errNodeExists = errors.New("Node already exists")
@@ -9,6 +12,7 @@ var errConnectionDoesNotExits = errors.New("Unable to perform operation: connect
 var errNodeOutOfRange = errors.New("Node out of range")
 var errCannotDeleteNil = errors.New("Cannot delte: node does not exist") //totally unnecessary, but I like to be explicit with these things
 var errCannotConnectSelf = errors.New("Node cannot be connected to itself")
+var errDataNotFound = errors.New("Error: data not found")
 
 //Node is an instance or entry in the graph. It holds data
 //and an adjacency list. The indeces represent the nodes held
@@ -138,4 +142,47 @@ func (g *graph) delConnection(a, b int) error {
 
 	return nil
 
+}
+
+//searchDeep implements a depth-first search algorithm, starting at 0,
+//until either the data is found or every node has been searched. If the
+//data is found, the index of the node containing the data is returned,
+//along with a nil error. Otherwise, a nil pointer and a non-nil error
+//are returned
+func (g *graph) searchDeep(data []byte) (int, error) {
+	//create a slice of all the nodes that have already been visited
+	visited := make([]bool, len(g.nodes))
+
+	//we'll start with the 0th node. If that is it, return it,
+	//otherwise recursively search down the line
+	if bytes.Compare(g.nodes[0].data, data) == 0 {
+		return 0, nil
+	}
+
+	for i := 0; i < len(g.nodes[0].edges); i++ {
+		if !visited[i] && g.nodes[0].edges[i] != 0 {
+			visited[i] = true
+			if node, err := g.searchNext(data, visited, i); err != nil {
+				return node, err
+			}
+		}
+	}
+
+	return 0, errDataNotFound
+
+}
+
+//searchNext does that
+func (g *graph) searchNext(data []byte, visited []bool, node int) (int, error) {
+	if bytes.Compare(g.nodes[node].data, data) == 0 {
+		return node, nil
+	}
+	for i := 0; i < len(g.nodes[node].edges); i++ {
+		if !visited[i] && g.nodes[node].edges[i] != 0 {
+			if node, err := g.searchNext(data, visited, i); err != nil {
+				return node, err
+			}
+		}
+	}
+	return 0, errDataNotFound
 }
