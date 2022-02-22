@@ -5,6 +5,7 @@ import "errors"
 var errMustBePositive = errors.New("Index value must be positive")
 var errNodeExists = errors.New("Node already exists")
 var errConnectionNodeNotFound = errors.New("Unable to make connection: node not found")
+var errConnectionDoesNotExits = errors.New("Unable to perform operation: connection does not exist")
 var errNodeOutOfRange = errors.New("Node out of range")
 var errCannotDeleteNil = errors.New("Cannot delte: node does not exist") //totally unnecessary, but I like to be explicit with these things
 var errCannotConnectSelf = errors.New("Node cannot be connected to itself")
@@ -88,4 +89,53 @@ func (g *graph) delNode(a int) ([]byte, error) {
 }
 
 //newConnection takes a node and adds a connection to its adjecency list. Magic!
-func (g *graph) newConnection(a, b int, weight ...float64) error {}
+//The function returns a non-nil error if on or both of the nodes cannot be found.
+//If a connection between the two nodes already exists, the connection will be
+//overwritten with the new weight. If no weight is given, either for a new or an
+//existing connection, the weight will be set to 1.0
+func (g *graph) newConnection(a, b int, weight ...float64) error {
+	if a < 0 || b < 0 {
+		return errMustBePositive
+	}
+
+	if a >= len(g.nodes) || b >= len(g.nodes) {
+		return errNodeOutOfRange
+	}
+
+	var w float64
+	if len(weight) > 0 {
+		w = weight[0]
+	} else {
+		w = 1
+	}
+
+	if b >= len(g.nodes[a].edges) {
+		pad := make([]float64, b-len(g.nodes[a].edges))
+		g.nodes[a].edges = append(g.nodes[a].edges, pad...)
+	}
+
+	g.nodes[a].edges[b] = w
+
+	return nil
+
+}
+
+//delConnection removes a connection between two nodes
+func (g *graph) delConnection(a, b int) error {
+	if a < 0 || b < 0 {
+		return errMustBePositive
+	}
+
+	if a >= len(g.nodes) || b >= len(g.nodes) {
+		return errNodeOutOfRange
+	}
+
+	if b >= len(g.nodes[a].edges) {
+		return errConnectionDoesNotExits
+	}
+
+	g.nodes[a].edges[b] = 0
+
+	return nil
+
+}
